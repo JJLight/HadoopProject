@@ -1,0 +1,3 @@
+hive -e 'use tax;add jar /opt/cloudera/parcels/CDH-4.4.0-1.cdh4.4.0.p0.39/lib/hive/lib/hive-contrib-0.10.0-cdh4.4.0.jar;drop table tax_access_log;CREATE TABLE tax_access_log ROW FORMAT SERDE "org.apache.hadoop.hive.serde2.columnar.ColumnarSerDe" STORED AS RCFile AS SELECT client_ip,client,userid,request,status,bytes_sent, from_unixtime(unix_timestamp(date_time,"dd/MMM/yyyy:hh:mm:ss")) as date_time,referer,useragent,host FROM tax_access_log_raw where date_time is not NULL;'
+
+impala-shell -i 'dn1' -q 'use tax;refresh tax_access_log;select host,max(date_time),count(*) from  tax.tax_access_log group by host limit 20';
